@@ -16,14 +16,17 @@ const io = new Server(httpServer, {cors:{
   }});
 
   let connections = []
+  let elements;
   io.on('connect', (socket) => {
       connections.push(socket);
+
       console.log(`${socket.id} has connected`)
       
-      socket.on('draw', (data) => {
+      socket.on('elements', (data) => {
+        elements = data
           connections.forEach(con => {
               if (con.id !== socket.id) {
-                  con.emit('ondraw', data)
+                  con.emit('servedElements', {elements})
               }
           })
       })
@@ -37,9 +40,6 @@ const io = new Server(httpServer, {cors:{
       })
   })
   
-  app.get('/', (req, res) => {
-    res.send.json('connected')
-  })
 
 httpServer.listen(PORT, () => {
     console.log(`listening on ${PORT}`)
